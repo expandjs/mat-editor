@@ -72,7 +72,6 @@ This element is used to display a material code editor.
                 background: hsla(0, 0%, 30%, 1);
                 box-sizing: border-box;
                 margin: 16px 0 4px 0;
-                padding: 1px;
                 position: relative;
             }
 
@@ -91,14 +90,21 @@ This element is used to display a material code editor.
             }
 
             :host #matEditorContainer .CodeMirror,
+            :host #matEditorContainer .CodeMirror-gutters,
             :host #matEditorContainer .CodeMirror-scrollbar-filler {
                 background: transparent !important;
+                border: none !important;
                 cursor: text !important;
             }
 
+            :host #matEditorContainer .CodeMirror-gutters,
             :host #matEditorContainer .CodeMirror-hscrollbar,
             :host #matEditorContainer .CodeMirror-vscrollbar {
-                cursor: auto;
+                cursor: default !important;
+            }
+
+            :host #matEditorContainer .CodeMirror-linenumber {
+                color: inherit;
             }
 
             :host #matEditorToggle {
@@ -119,7 +125,7 @@ This element is used to display a material code editor.
                   readonly="{{readonly}}" value="{{value}}"></template>
         <div id="matEditorWrapper">
             <mat-label id="matEditorLabel" focused="{{focused}}" hidden?="{{emptyLabel || fullScreen}}">{{label}}</mat-label>
-            <mat-paper id="matEditorContainer" background="grey-900"></mat-paper>
+            <mat-paper id="matEditorContainer" background="grey-800"></mat-paper>
             <mat-icon-button id="matEditorToggle" active="{{fullScreen}}" activeIcon="navigation:fullscreen-exit" color="white" hidden?="{{!expandable}}" icon="navigation:fullscreen" toggleable></mat-icon-button>
         </div>
     </template>
