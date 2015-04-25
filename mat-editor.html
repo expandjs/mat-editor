@@ -34,7 +34,7 @@ This element is used to display a material code editor.
 <link rel="import" href="../mat-paper/mat-paper.html">
 <link rel="import" href="../xp-input-state/xp-input-state.html">
 
-<polymer-element name="mat-editor" constructor="MATEditorElement" attributes="autoFocus changed empty emptyLabel expandable focused form fullScreen height indent inputElement inputValue label mode name value">
+<polymer-element name="mat-editor" constructor="MATEditorElement" attributes="autoFocus changed empty emptyLabel expandable focused form fullScreen height indent inputElement inputValue label lineNumbers mode name value">
 
     <template>
         <link rel="stylesheet" href="../codemirror/lib/codemirror.css">
@@ -42,6 +42,7 @@ This element is used to display a material code editor.
         <style>
             :host {
                 display: block;
+                height: 100%;
                 overflow: visible;
                 text-align: left;
             }
@@ -68,19 +69,16 @@ This element is used to display a material code editor.
                 top: -32px;
             }
 
-            :host #matEditorWrapper {
-                background: hsla(0, 0%, 30%, 1);
-                box-sizing: border-box;
-                margin: 16px 0 4px 0;
+            :host #matEditorWrapper,
+            :host #matEditorContainer {
+                height: 100%;
                 position: relative;
+                transition: none;
             }
 
             :host(:not([emptyLabel])) #matEditorWrapper {
                 margin-top: 32px;
-            }
-
-            :host #matEditorContainer {
-                transition: none;
+                height: calc(100% - 32px);
             }
 
             :host([fullScreen]) #matEditorWrapper,
@@ -90,15 +88,14 @@ This element is used to display a material code editor.
             }
 
             :host #matEditorContainer .CodeMirror,
-            :host #matEditorContainer .CodeMirror-gutters,
             :host #matEditorContainer .CodeMirror-scrollbar-filler {
                 background: transparent !important;
-                border: none !important;
+                cursor: text !important;
             }
 
-            :host #matEditorContainer .CodeMirror,
-            :host #matEditorContainer .CodeMirror-scrollbar-filler {
-                cursor: text !important;
+            :host #matEditorContainer .CodeMirror-gutters {
+                background: hsla(0, 0%, 26%, 1) !important;
+                border: none !important;
             }
 
             :host #matEditorContainer .CodeMirror-gutters,
@@ -129,7 +126,7 @@ This element is used to display a material code editor.
                   readonly="{{readonly}}" value="{{value}}"></template>
         <div id="matEditorWrapper">
             <mat-label id="matEditorLabel" focused="{{focused}}" hidden?="{{emptyLabel || fullScreen}}">{{label}}</mat-label>
-            <mat-paper id="matEditorContainer" background="grey-800"></mat-paper>
+            <mat-paper id="matEditorContainer" background="grey-900"></mat-paper>
             <mat-icon-button id="matEditorToggle" active="{{fullScreen}}" activeIcon="navigation:fullscreen-exit" color="white" hidden?="{{!expandable}}" icon="navigation:fullscreen" toggleable></mat-icon-button>
         </div>
     </template>
@@ -226,6 +223,7 @@ This element is used to display a material code editor.
             update: function () {
                 var self = this;
                 self.inputElement.setOption('indentUnit', self.indent);
+                self.inputElement.setOption('lineNumbers', self.lineNumbers);
                 self.inputElement.setOption('mode', self.mode);
                 self.inputElement.setOption('readOnly', self.readonly);
                 self.inputElement.setOption('tabSize', self.indent);
@@ -241,7 +239,7 @@ This element is used to display a material code editor.
 
             // OBSERVE
             observe: {
-                'mode indent': 'refresh',
+                'mode indent lineNumbers': 'refresh',
                 'fullScreen height': 'resize'
             },
 
@@ -324,13 +322,13 @@ This element is used to display a material code editor.
                 fullScreen: {reflect: true, value: false},
 
                 /**
-                 * The editor's height. If 0 the editor will resize itself based on content.
+                 * The editor's height (0 for 100%).
                  *
                  * @attribute height
                  * @type number
-                 * @default 300
+                 * @default 0
                  */
-                height: {reflect: true, value: 300},
+                height: {reflect: true, value: 0},
 
                 /**
                  * How many spaces to be used for the indentation.
@@ -369,6 +367,15 @@ This element is used to display a material code editor.
                 label: {reflect: false, value: ''},
 
                 /**
+                 * If set to true, line numbers are visible.
+                 *
+                 * @attribute lineNumbers
+                 * @type boolean
+                 * @default false
+                 */
+                lineNumbers: {reflect: true, value: false},
+
+                /**
                  * The mode to be used for the editor.
                  *
                  * @attribute mode
@@ -404,7 +411,6 @@ This element is used to display a material code editor.
              * @private
              */
             options: {
-                lineNumbers: true,
                 showCursorWhenSelecting: true,
                 theme: 'ambiance',
                 extraKeys: {
