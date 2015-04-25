@@ -1,0 +1,424 @@
+<!--
+@license
+Copyright (c) 2015 The expand.js authors. All rights reserved.
+This code may only be used under the BSD style license found at https://expandjs.github.io/LICENSE.txt
+The complete set of authors may be found at https://expandjs.github.io/AUTHORS.txt
+The complete set of contributors may be found at https://expandjs.github.io/CONTRIBUTORS.txt
+-->
+
+<!--
+This component is used to display a material code editor.
+
+@component mat-editor
+@description This component is used to display a material code editor.
+
+@dependency codemirror Codemirror/codemirror#~5.0
+@dependency polymer Polymer/polymer#^0.5
+@dependency expandjs ExpandJS/expandjs
+@dependency mat-icon-button ExpandJS/mat-icon-button
+@dependency mat-label ExpandJS/mat-label
+@dependency xp-input-state ExpandJS/xp-input-state
+
+@devDependency mat-demo ExpandJS/mat-demo
+-->
+
+<script src="../codemirror/lib/codemirror.js"></script>
+<script src="../codemirror/mode/css/css.js"></script>
+<script src="../codemirror/mode/javascript/javascript.js"></script>
+<script src="../codemirror/mode/xml/xml.js"></script>
+<script src="../codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../expandjs/expandjs.html">
+<link rel="import" href="../mat-icon-button/mat-icon-button.html">
+<link rel="import" href="../mat-label/mat-label.html">
+<link rel="import" href="../xp-input-state/xp-input-state.html">
+
+<polymer-element name="mat-editor" constructor="MATEditorElement" attributes="autoFocus changed empty emptyLabel expandable focused form fullScreen height indent inputElement inputValue label mode name value">
+
+    <template>
+        <link rel="stylesheet" href="../codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="../codemirror/theme/ambiance.css">
+        <style>
+            :host {
+                display: block;
+                overflow: visible;
+                text-align: left;
+            }
+
+            :host([fullScreen]) {
+                height: auto !important;
+                margin: 0 !important;
+                width: auto !important;
+                z-index: 6;
+
+                /* FIT */
+                bottom: 0;
+                left: 0;
+                position: absolute;
+                right: 0;
+                top: 0;
+            }
+
+            :host #matEditorLabel {
+                left: 0;
+                padding-bottom: 8px;
+                position: absolute;
+                right: 0;
+                top: -32px;
+            }
+
+            :host #matEditorWrapper {
+                background: hsla(0, 0%, 30%, 1);
+                box-sizing: border-box;
+                margin: 16px 0 4px 0;
+                padding: 1px;
+                position: relative;
+            }
+
+            :host(:not([emptyLabel])) #matEditorWrapper {
+                margin-top: 32px;
+            }
+
+            :host([fullScreen]) #matEditorWrapper,
+            :host([fullScreen]) #matEditorContainer {
+                height: 100% !important;
+                margin: 0 !important;
+            }
+
+            :host #matEditorContainer .CodeMirror,
+            :host #matEditorContainer .CodeMirror-scrollbar-filler {
+                background: transparent !important;
+                cursor: text !important;
+            }
+
+            :host #matEditorContainer .CodeMirror-hscrollbar,
+            :host #matEditorContainer .CodeMirror-vscrollbar {
+                cursor: auto;
+            }
+
+            :host #matEditorToggle {
+                opacity: 0.12;
+                position: absolute;
+                right: 4px;
+                top: 0;
+                z-index: 2;
+            }
+
+            :host #matEditorToggle:hover {
+                opacity: 0.30;
+            }
+        </style>
+        <template context="{{}}" is="xp-input-state" id="xpInputState" changed="{{changed}}" empty="{{empty}}"
+                  focused="{{focused}}" form="{{form}}" inputElement="{{inputElement}}" inputValue="{{inputValue}}"
+                  name="{{name}}" opCommitFrom="{{commitFrom}}" opCommitTo="{{commitTo}}" opUpdate="{{update}}"
+                  readonly="{{readonly}}" value="{{value}}"></template>
+        <div id="matEditorWrapper">
+            <mat-label id="matEditorLabel" focused="{{focused}}" hidden?="{{emptyLabel || fullScreen}}">{{label}}</mat-label>
+            <mat-paper id="matEditorContainer" background="grey-900"></mat-paper>
+            <mat-icon-button id="matEditorToggle" active="{{fullScreen}}" activeIcon="navigation:fullscreen-exit" color="white" hidden?="{{!expandable}}" icon="navigation:fullscreen" toggleable></mat-icon-button>
+        </div>
+    </template>
+
+    <script>
+        XPComponent({
+
+            /**
+             * Focuses the input
+             *
+             * @method focus
+             * @returns {Element}
+             */
+            focus: function () {
+                var self = this;
+                self.inputElement.focus();
+                return self;
+            },
+
+            /**
+             * Resets the input.
+             *
+             * @method reset
+             * @returns {Element}
+             */
+            reset: function () {
+                var self = this;
+                self.$.xpInputState.reset();
+                return self;
+            },
+
+            /**
+             * Resizes the input
+             *
+             * @method resize
+             * @returns {Element}
+             */
+            resize: function () {
+                var self = this;
+                XP.setStyle(self.$.matEditorContainer, 'height', self.height ? self.height + 'px' : null);
+                self.inputElement.setSize(null, (!self.fullScreen && self.height) || '100%');
+                self.inputElement.refresh();
+                return self;
+            },
+
+            /*********************************************************************/
+
+            /**
+             * Commits from input's value.
+             *
+             * @method commitFromInput
+             * @returns {Element}
+             * @private
+             */
+            commitFrom: function () {
+                var self = this;
+                self.inputValue = self.inputElement.getValue();
+                return self;
+            },
+
+            /**
+             * Commits to input's value.
+             *
+             * @method commitToInput
+             * @returns {Element}
+             * @private
+             */
+            commitTo: function () {
+                var self = this;
+                if (self.inputValue !== self.inputElement.getValue()) { self.inputElement.setValue(self.inputValue); }
+                return self;
+            },
+
+            /**
+             * Refreshes the element.
+             *
+             * @method refresh
+             * @returns {Element}
+             * @private
+             */
+            refresh: function () {
+                var self = this;
+                self.$.xpInputState.refresh();
+                return self;
+            },
+
+            /**
+             * Updates the input.
+             *
+             * @method update
+             * @returns {Element}
+             * @private
+             */
+            update: function () {
+                var self = this;
+                self.inputElement.setOption('indentUnit', self.indent);
+                self.inputElement.setOption('mode', self.mode);
+                self.inputElement.setOption('readOnly', self.readonly);
+                self.inputElement.setOption('tabSize', self.indent);
+                return self;
+            },
+
+            /*********************************************************************/
+
+            // COMPUTED
+            computed: {
+                'emptyLabel': '!label'
+            },
+
+            // OBSERVE
+            observe: {
+                'mode indent': 'refresh',
+                'fullScreen height': 'resize'
+            },
+
+            // PUBLISH
+            publish: {
+
+                /**
+                 * If set to true, the input will focus on attach.
+                 *
+                 * @attribute autoFocus
+                 * @type boolean
+                 * @default false
+                 */
+                autoFocus: {reflect: true, value: false},
+
+                /**
+                 * If set to true, the input's value is changed.
+                 *
+                 * @attribute changed
+                 * @type boolean
+                 * @default false
+                 * @readonly
+                 */
+                changed: {reflect: true, value: false},
+
+                /**
+                 * If set to true, the input is empty.
+                 *
+                 * @attribute empty
+                 * @type boolean
+                 * @default false
+                 * @readonly
+                 */
+                empty: {reflect: true, value: false},
+
+                /**
+                 * If set to true, the input's label is hidden.
+                 *
+                 * @attribute emptyLabel
+                 * @type boolean
+                 * @default false
+                 * @readonly
+                 */
+                emptyLabel: {reflect: true, value: false},
+
+                /**
+                 * If set to true, the input's full screen toggle is visible.
+                 *
+                 * @attribute expandable
+                 * @type boolean
+                 * @default false
+                 */
+                expandable: {reflect: true, value: false},
+
+                /**
+                 * If set to true, the input is focused.
+                 *
+                 * @attribute focused
+                 * @type boolean
+                 * @default false
+                 */
+                focused: {reflect: true, value: false},
+
+                /**
+                 * The input's form.
+                 *
+                 * @attribute form
+                 * @type Element
+                 * @readonly
+                 */
+                form: {reflect: false, value: null},
+
+                /**
+                 * If set to true, the editor will cover the whole viewport.
+                 *
+                 * @attribute fullScreen
+                 * @type boolean
+                 * @default false
+                 */
+                fullScreen: {reflect: true, value: false},
+
+                /**
+                 * The editor's height. If 0 the editor will resize itself based on content.
+                 *
+                 * @attribute height
+                 * @type number
+                 * @default 300
+                 */
+                height: {reflect: true, value: 300},
+
+                /**
+                 * How many spaces to be used for the indentation.
+                 *
+                 * @attribute indent
+                 * @type number
+                 * @default 4
+                 */
+                indent: {reflect: true, value: 4},
+
+                /**
+                 * The appended input's element.
+                 *
+                 * @attribute inputElement
+                 * @type Element
+                 * @readonly
+                 */
+                inputElement: {reflect: false, value: null},
+
+                /**
+                 * The input's plain value.
+                 *
+                 * @attribute inputValue
+                 * @type string
+                 * @default ""
+                 */
+                inputValue: {reflect: false, value: ''},
+
+                /**
+                 * The input's label.
+                 *
+                 * @attribute label
+                 * @type string
+                 * @default ""
+                 */
+                label: {reflect: false, value: ''},
+
+                /**
+                 * The mode to be used for the editor.
+                 *
+                 * @attribute mode
+                 * @type string
+                 * @default "htmlmixed"
+                 */
+                mode: {reflect: true, value: 'htmlmixed'},
+
+                /**
+                 * The input's name.
+                 *
+                 * @attribute name
+                 * @type string
+                 * @default ""
+                 */
+                name: {reflect: true, value: ''},
+
+                /**
+                 * The input's value.
+                 *
+                 * @attribute value
+                 * @type *
+                 */
+                value: {reflect: false, value: null}
+            },
+
+            /**
+             * The default options.
+             *
+             * @property options
+             * @type Object
+             * @readonly
+             * @private
+             */
+            options: {
+                lineNumbers: true,
+                showCursorWhenSelecting: true,
+                theme: 'ambiance',
+                extraKeys: {
+                    Tab: function(inputElement) {
+                        inputElement.replaceSelection(XP.repeat(' ', inputElement.getOption("indentUnit")));
+                    }
+                }
+            },
+
+            /*********************************************************************/
+
+            // LISTENER
+            ready: function () {
+
+                // Vars
+                var self = this;
+
+                // Appending
+                self.inputElement = CodeMirror(self.$.matEditorContainer, XP.assign({autofocus: self.autoFocus, tabindex: self.tabIndex}, self.options));
+
+                // Listening
+                self.inputElement.on('blur', self.$.xpInputState.handleBlurBinded);
+                self.inputElement.on('change', self.$.xpInputState.handleChangeBinded);
+                self.inputElement.on('focus', self.$.xpInputState.handleFocusBinded);
+
+                // Resizing
+                self.resize();
+            }
+        });
+    </script>
+
+</polymer-element>
