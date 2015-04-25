@@ -31,6 +31,7 @@ This component is used to display a material code editor.
 <link rel="import" href="../expandjs/expandjs.html">
 <link rel="import" href="../mat-icon-button/mat-icon-button.html">
 <link rel="import" href="../mat-label/mat-label.html">
+<link rel="import" href="../mat-paper/mat-paper.html">
 <link rel="import" href="../xp-input-state/xp-input-state.html">
 
 <polymer-element name="mat-editor" constructor="MATEditorElement" attributes="autoFocus changed empty emptyLabel expandable focused form fullScreen height indent inputElement inputValue label mode name value">
@@ -77,6 +78,10 @@ This component is used to display a material code editor.
 
             :host(:not([emptyLabel])) #matEditorWrapper {
                 margin-top: 32px;
+            }
+
+            :host #matEditorContainer {
+                transition: none;
             }
 
             :host([fullScreen]) #matEditorWrapper,
