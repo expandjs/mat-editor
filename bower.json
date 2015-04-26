@@ -1,7 +1,7 @@
 {
   "name": "mat-editor",
   "license": "BSD-3-Clause",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "This element is used to display a material code editor.",
   "homepage": "http://www.expandjs.com/elements/mat-editor",
   "authors": [
