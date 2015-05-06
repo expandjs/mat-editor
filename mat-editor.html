@@ -454,9 +454,9 @@ This element is used to display a material code editor.
                 self.injected = CodeMirror(self.$.matEditorContainer, XP.assign({autofocus: self.autoFocus, tabindex: self.tabIndex}, self.options));
 
                 // Listening
-                self.injected.on('blur', self.$.xpInputState.handleBlurBinded);
-                self.injected.on('change', self.$.xpInputState.handleChangeBinded);
-                self.injected.on('focus', self.$.xpInputState.handleFocusBinded);
+                self.injected.on('blur', self.$.xpInputState.handleBlurBound);
+                self.injected.on('change', self.$.xpInputState.handleChangeBound);
+                self.injected.on('focus', self.$.xpInputState.handleFocusBound);
 
                 // Resizing
                 self.resize();
