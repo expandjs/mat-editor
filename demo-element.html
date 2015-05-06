@@ -1,0 +1,45 @@
+<link rel="import" href="../mat-demo/mat-demo.html">
+<link rel="import" href="mat-editor.html">
+
+<polymer-element name="mat-editor-demo">
+
+    <template>
+        <style>
+            :host .editor {
+                margin: 0 32px;
+            }
+        </style>
+        <mat-demo label="mat-editor">
+
+            <h1>Default</h1>
+            <mat-editor class="editor" id="editorHTML" label="HTML Editor" height="300" expandable lineNumbers></mat-editor>
+
+            <h1>Javascript</h1>
+            <mat-editor class="editor" id="editorJS" label="JS Editor" mode="javascript" height="300" expandable lineNumbers></mat-editor>
+
+        </mat-demo>
+    </template>
+
+    <script>
+        Polymer({
+
+            // LISTENER
+            ready: function () {
+                var self = this;
+                self.$.editorHTML.value  = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n';
+                self.$.editorHTML.value += 'Vivamus dignissim vestibulum purus vel pulvinar.\n';
+                self.$.editorHTML.value += 'Donec cursus malesuada sem eget placerat. Maecenas et lobortis ex.\n';
+                self.$.editorHTML.value += 'Proin tincidunt, nunc at euismod condimentum, justo est ultrices arcu, non interdum mi sem eget velit.\n';
+                self.$.editorHTML.value += 'Morbi laoreet, nibh at luctus ornare, enim risus tincidunt sapien, ac hendrerit purus ipsum sed justo.\n';
+                self.$.editorHTML.value += 'Etiam sagittis dolor neque, vitae congue purus ornare eget.\n';
+                self.$.editorHTML.value += 'Aenean non enim ex. Sed porta dignissim efficitur.\n';
+                self.$.editorHTML.value += 'Nullam sagittis justo turpis, dapibus volutpat nulla luctus non.\n';
+                self.$.editorHTML.value += 'Suspendisse nec sagittis mauris.\n';
+                self.$.editorHTML.value += 'Suspendisse ut velit quis elit dapibus viverra.\n';
+                self.$.editorHTML.value += 'Duis eget orci eros. Vivamus scelerisque blandit magna at auctor.';
+                self.$.editorJS.value   = '(function () {\n    console.log("Hello world!");\n}());'
+            }
+        });
+    </script>
+
+</polymer-element>
