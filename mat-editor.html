@@ -12,8 +12,8 @@ This element is used to display a material code editor.
 @element mat-editor
 @description A custom element used to display a Material Design code editor
 @group inputs
-@homepage http://www.expandjs.com/elements/mat-editor
-@demo http://www.expandjs.com/demo/mat-editor
+@homepage http://expandjs.com/elements/mat-editor
+@demo http://expandjs.com/demo/mat-editor
 
 @dependency codemirror Codemirror/codemirror#~5.0
 @dependency polymer Polymer/polymer#^0.5
@@ -147,6 +147,18 @@ This element is used to display a material code editor.
 
     <script>
         XPElement({
+
+            /**
+             * Blurs the input.
+             *
+             * @method blur
+             * @returns {Element}
+             */
+            blur: function () {
+                var self = this;
+                self.injected.focus();
+                return self;
+            },
 
             /**
              * Focuses the input
