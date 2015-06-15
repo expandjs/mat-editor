@@ -26,13 +26,13 @@
   ],
   "dependencies": {
     "codemirror": "Codemirror/codemirror#~5.0",
-    "expandjs": "ExpandJS/expandjs",
-    "mat-icon-button": "ExpandJS/mat-icon-button",
-    "mat-label": "ExpandJS/mat-label",
-    "xp-input-state": "ExpandJS/xp-input-state",
+    "expandjs": "ExpandJS/expandjs#alpha",
+    "mat-icon-button": "ExpandJS/mat-icon-button#alpha",
+    "mat-label": "ExpandJS/mat-label#alpha",
+    "xp-input-state": "ExpandJS/xp-input-state#alpha",
     "polymer": "Polymer/polymer#^0.5"
   },
   "devDependencies": {
-    "mat-demo": "ExpandJS/mat-demo"
+    "mat-demo": "ExpandJS/mat-demo#alpha"
   }
 }
