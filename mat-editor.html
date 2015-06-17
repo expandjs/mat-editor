@@ -1,0 +1,407 @@
+<!--
+@license
+Copyright (c) 2015 The ExpandJS authors. All rights reserved.
+This code may only be used under the BSD style license found at https://expandjs.github.io/LICENSE.txt
+The complete set of authors may be found at https://expandjs.github.io/AUTHORS.txt
+The complete set of contributors may be found at https://expandjs.github.io/CONTRIBUTORS.txt
+-->
+
+<!--
+This element is used to display a material code editor.
+
+@element mat-editor
+@description A custom element used to display a Material Design code editor
+@keywords material design, material editor, material text editor, web app, html5, expandjs, web-components
+@group inputs
+@homepage http://expandjs.com/elements/mat-editor
+@demo http://expandjs.com/demo/mat-editor
+
+@behavior xp-input-behavior http://expandjs.com/elements/xp-input-behavior
+
+@dependency codemirror Codemirror/codemirror#~5.0
+@dependency polymer Polymer/polymer
+@dependency expandjs ExpandJS/expandjs
+@dependency iron-flex-layout PolymerElements/iron-flex-layout
+@dependency mat-icon-button ExpandJS/mat-icon-button
+@dependency mat-icons ExpandJS/mat-icons
+@dependency mat-label ExpandJS/mat-label
+@dependency mat-paper ExpandJS/mat-paper
+@dependency xp-input-behavior ExpandJS/xp-input-behavior
+
+@devDependency mat-demo ExpandJS/mat-demo
+-->
+
+<script src="../codemirror/lib/codemirror.js"></script>
+<script src="../codemirror/mode/css/css.js"></script>
+<script src="../codemirror/mode/javascript/javascript.js"></script>
+<script src="../codemirror/mode/xml/xml.js"></script>
+<script src="../codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../expandjs/expandjs.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../mat-icon-button/mat-icon-button.html">
+<link rel="import" href="../mat-icons/navigation-icons.html">
+<link rel="import" href="../mat-label/mat-label.html">
+<link rel="import" href="../mat-paper/mat-paper.html">
+<link rel="import" href="../xp-input-behavior/xp-input-behavior.html">
+
+<link rel="stylesheet" href="../codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="../codemirror/theme/ambiance.css">
+
+<dom-module id="mat-editor">
+
+    <style>
+        :host {
+            display: block;
+            height: 100%;
+            overflow: visible;
+            text-align: left;
+        }
+
+        :host([full-screen]) {
+            @apply(--layout-fit);
+            height: auto !important;
+            margin: 0 !important;
+            width: auto !important;
+            z-index: 6;
+        }
+
+        :host #matEditorLabel {
+            left: 0;
+            padding-bottom: 8px;
+            position: absolute;
+            right: 0;
+            top: -32px;
+        }
+
+        :host([empty-label]) #matEditorLabel,
+        :host([full-screen]) #matEditorLabel {
+            display: none !important;
+        }
+
+        :host #matEditorWrapper,
+        :host #matEditorContainer {
+            height: 100%;
+            position: relative;
+            transition: none;
+        }
+
+        :host(:not([empty-label])) #matEditorWrapper {
+            margin-top: 32px;
+            height: calc(100% - 32px);
+        }
+
+        :host([full-screen]) #matEditorWrapper,
+        :host([full-screen]) #matEditorContainer {
+            height: 100% !important;
+            margin: 0 !important;
+        }
+
+        :host #matEditorContainer .CodeMirror {
+            @apply(--mat-font-body);
+        }
+
+        :host #matEditorContainer .CodeMirror,
+        :host #matEditorContainer .CodeMirror-scrollbar-filler {
+            background: transparent !important;
+            cursor: text !important;
+        }
+
+        :host #matEditorContainer .CodeMirror-gutters {
+            background: hsla(0, 0%, 26%, 1) !important;
+            border: none !important;
+        }
+
+        :host #matEditorContainer .CodeMirror-gutters,
+        :host #matEditorContainer .CodeMirror-hscrollbar,
+        :host #matEditorContainer .CodeMirror-vscrollbar {
+            cursor: default !important;
+        }
+
+        :host #matEditorContainer .CodeMirror-linenumber {
+            color: inherit;
+        }
+
+        :host #matEditorToggle {
+            opacity: 0.10;
+            position: absolute;
+            right: 4px;
+            top: 0;
+            z-index: 2;
+        }
+
+        :host #matEditorToggle:hover {
+            opacity: 0.30;
+        }
+
+        :host(:not([expandable])) #matEditorToggle {
+            display: none !important;
+        }
+    </style>
+
+    <template>
+        <div id="matEditorWrapper">
+            <mat-label id="matEditorLabel" focused="[[focused]]">{{label}}</mat-label>
+            <mat-paper id="matEditorContainer" background="grey-900"></mat-paper>
+            <mat-icon-button id="matEditorToggle" active="{{fullScreen}}" activeIcon="navigation:fullscreen-exit" color="white" icon="navigation:fullscreen" toggleable></mat-icon-button>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+
+            // ELEMENT
+            is: 'mat-editor',
+
+            // BEHAVIORS
+            behaviors: [
+                Polymer.XPInputBehavior
+            ],
+
+            /*********************************************************************/
+
+            /**
+             * Blurs the input.
+             *
+             * @method blur
+             * @returns {Element}
+             */
+            blur: function () {
+                var self = this;
+                self.injected.focus();
+                return self;
+            },
+
+            /**
+             * Focuses the input
+             *
+             * @method focus
+             * @returns {Element}
+             */
+            focus: function () {
+                var self = this;
+                self.injected.focus();
+                return self;
+            },
+
+            /**
+             * Resizes the input
+             *
+             * @method resize
+             * @returns {Element}
+             */
+            resize: function () {
+
+                // Vars
+                var self = this;
+
+                // Checking
+                if (!self.injected) { return self; }
+
+                // Styling
+                XP.setStyle(self.$.matEditorContainer, 'height', self.height ? self.height + 'px' : null);
+
+                // Resizing
+                self.injected.setSize(null, (!self.fullScreen && self.height) || '100%');
+                self.injected.refresh();
+
+                return self;
+            },
+
+            /*********************************************************************/
+
+            /**
+             * Commits from input's value.
+             *
+             * @method _commitFrom
+             * @returns {Element}
+             * @private
+             */
+            _commitFrom: function () {
+                var self = this;
+                self.value = self.injected.getValue();
+                return self;
+            },
+
+            /**
+             * Commits to input's value.
+             *
+             * @method _commitTo
+             * @returns {Element}
+             * @private
+             */
+            _commitTo: function () {
+                var self = this;
+                if (self.value !== self.injected.getValue()) { self.injected.setValue(self.value); }
+                return self;
+            },
+
+            /**
+             * Injects the input element.
+             *
+             * @method _inject
+             * @returns {Element}
+             * @private
+             */
+            _inject: function () {
+
+                // Vars
+                var self = this;
+
+                // Injecting
+                self._setInjected(CodeMirror(self.$.matEditorContainer, XP.assign({autofocus: self.autoFocus, tabindex: self.tabIndex}, self.options)));
+
+                // Listening
+                self.injected.on('blur', self._blurHandler.bind(self));
+                self.injected.on('change', self._changeHandler.bind(self));
+                self.injected.on('focus', self._focusHandler.bind(self));
+
+                return self;
+            },
+
+            /**
+             * Updates the input.
+             *
+             * @method _update
+             * @returns {Element}
+             * @private
+             */
+            _update: function () {
+                var self = this;
+                self.injected.setOption('indentUnit', self.indent);
+                self.injected.setOption('lineNumbers', self.lineNumbers);
+                self.injected.setOption('mode', self.mode);
+                self.injected.setOption('readOnly', self.readonly);
+                self.injected.setOption('tabSize', self.indent);
+                return self;
+            },
+
+            /*********************************************************************/
+
+            // OBSERVERS
+            observers: [
+                '_refresh(mode, indent, lineNumbers)',
+                'resize(fullScreen, height)'
+            ],
+
+            // PROPERTIES
+            properties: {
+
+                /**
+                 * If set to true, the input's full screen toggle is visible.
+                 *
+                 * @attribute expandable
+                 * @type boolean
+                 * @default false
+                 */
+                expandable: {
+                    reflectToAttribute: true,
+                    type: Boolean,
+                    value: false
+                },
+
+                /**
+                 * If set to true, the editor will cover the whole viewport.
+                 *
+                 * @attribute full-screen
+                 * @type boolean
+                 * @default false
+                 */
+                fullScreen: {
+                    reflectToAttribute: true,
+                    type: Boolean,
+                    value: false
+                },
+
+                /**
+                 * The editor's height (0 for 100%).
+                 *
+                 * @attribute height
+                 * @type number
+                 */
+                height: {
+                    reflectToAttribute: true,
+                    type: Number,
+                    value: null
+                },
+
+                /**
+                 * How many spaces to be used for the indentation.
+                 *
+                 * @attribute indent
+                 * @type number
+                 * @default 4
+                 */
+                indent: {
+                    reflectToAttribute: true,
+                    type: Number,
+                    value: 4
+                },
+
+                /**
+                 * If set to true, line numbers are visible.
+                 *
+                 * @attribute line-numbers
+                 * @type boolean
+                 * @default false
+                 */
+                lineNumbers: {
+                    reflectToAttribute: true,
+                    type: Boolean,
+                    value: false
+                },
+
+                /**
+                 * The mode to be used for the editor.
+                 *
+                 * @attribute mode
+                 * @type string
+                 * @default "htmlmixed"
+                 */
+                mode: {
+                    reflectToAttribute: true,
+                    type: String,
+                    value: 'htmlmixed'
+                },
+
+                /**
+                 * If set to true, the input is readonly.
+                 *
+                 * @attribute readonly
+                 * @type boolean
+                 * @default false
+                 */
+                readonly: {
+                    reflectToAttribute: true,
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            /**
+             * The default options.
+             *
+             * @property options
+             * @type Object
+             * @readonly
+             */
+            options: {
+                showCursorWhenSelecting: true,
+                theme: 'ambiance',
+                extraKeys: {
+                    Tab: function(injected) {
+                        injected.replaceSelection(XP.repeat(' ', injected.getOption("indentUnit")));
+                    }
+                }
+            },
+
+            /*********************************************************************/
+
+            // LISTENER
+            attached: function () {
+                XP.delay(this.resize.bind(this));
+            }
+        });
+    </script>
+
+</dom-module>

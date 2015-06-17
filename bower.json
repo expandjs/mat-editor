@@ -1,0 +1,41 @@
+{
+  "name": "mat-editor",
+  "license": "BSD-3-Clause",
+  "version": "0.9.0",
+  "description": "A custom element used to display a Material Design code editor",
+  "homepage": "http://expandjs.com/elements/mat-editor",
+  "authors": [
+    "Giuliano Rullo <g.rullo@expandjs.com>",
+    "Maurizio Stefàno <m.stefano@expandjs.com>",
+    "Robert Manolea <r.manolea@expandjs.com>"
+  ],
+  "keywords": [
+    "material design",
+    "material editor",
+    "material text editor",
+    "web app",
+    "html5",
+    "expandjs",
+    "web-components"
+  ],
+  "main": [
+    "mat-editor.html"
+  ],
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "codemirror": "Codemirror/codemirror#~5.0",
+    "expandjs": "ExpandJS/expandjs",
+    "mat-icon-button": "ExpandJS/mat-icon-button",
+    "mat-icons": "ExpandJS/mat-icons",
+    "mat-label": "ExpandJS/mat-label",
+    "mat-paper": "ExpandJS/mat-paper",
+    "xp-input-behavior": "ExpandJS/xp-input-behavior",
+    "polymer": "Polymer/polymer",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout"
+  },
+  "devDependencies": {
+    "mat-demo": "ExpandJS/mat-demo"
+  }
+}
