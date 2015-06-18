@@ -231,7 +231,7 @@ This element is used to display a material code editor.
              */
             _commitTo: function () {
                 var self = this;
-                if (self.value !== self.injected.getValue()) { self.injected.setValue(self.value); }
+                if (self.value !== self.injected.getValue()) { self.injected.setValue(self.value || ''); }
                 return self;
             },
 
