@@ -25,15 +25,15 @@
     "**/.*"
   ],
   "dependencies": {
-    "codemirror": "Codemirror/codemirror#~5.0",
+    "codemirror": "Codemirror/codemirror#^5.0.0",
     "expandjs": "ExpandJS/expandjs#0.9.1",
     "mat-icon-button": "ExpandJS/mat-icon-button#0.9.1",
     "mat-icons": "ExpandJS/mat-icons#0.9.1",
     "mat-label": "ExpandJS/mat-label#0.9.1",
     "mat-paper": "ExpandJS/mat-paper#0.9.1",
     "xp-input-behavior": "ExpandJS/xp-input-behavior#0.9.1",
-    "polymer": "Polymer/polymer#^1.0.4",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.2"
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0"
   },
   "devDependencies": {
     "mat-demo": "ExpandJS/mat-demo#0.9.1"
