@@ -20,15 +20,15 @@ This element is used to display a material code editor.
 
 @dependency codemirror Codemirror/codemirror#^5.0.0
 @dependency polymer Polymer/polymer#^1.0.0
-@dependency expandjs ExpandJS/expandjs#0.9.3
+@dependency expandjs ExpandJS/expandjs#0.9.4
 @dependency iron-flex-layout PolymerElements/iron-flex-layout#^1.0.0
-@dependency mat-icon-button ExpandJS/mat-icon-button#0.9.3
-@dependency mat-icons ExpandJS/mat-icons#0.9.3
-@dependency mat-label ExpandJS/mat-label#0.9.3
-@dependency mat-paper ExpandJS/mat-paper#0.9.3
-@dependency xp-input-behavior ExpandJS/xp-input-behavior#0.9.3
+@dependency mat-icon-button ExpandJS/mat-icon-button#0.9.4
+@dependency mat-icons ExpandJS/mat-icons#0.9.4
+@dependency mat-label ExpandJS/mat-label#0.9.4
+@dependency mat-paper ExpandJS/mat-paper#0.9.4
+@dependency xp-input-behavior ExpandJS/xp-input-behavior#0.9.4
 
-@devDependency mat-demo ExpandJS/mat-demo#0.9.3
+@devDependency mat-demo ExpandJS/mat-demo#0.9.4
 -->
 
 <script src="../codemirror/lib/codemirror.js"></script>
@@ -171,7 +171,7 @@ This element is used to display a material code editor.
              */
             blur: function () {
                 var self = this;
-                self.injected.focus();
+                self.input.focus();
                 return self;
             },
 
@@ -183,7 +183,7 @@ This element is used to display a material code editor.
              */
             focus: function () {
                 var self = this;
-                self.injected.focus();
+                self.input.focus();
                 return self;
             },
 
@@ -199,14 +199,14 @@ This element is used to display a material code editor.
                 var self = this;
 
                 // Checking
-                if (!self.injected) { return self; }
+                if (!self.input) { return self; }
 
                 // Styling
                 XP.setStyle(self.$.matEditorContainer, 'height', self.height ? self.height + 'px' : null);
 
                 // Resizing
-                self.injected.setSize(null, (!self.fullScreen && self.height) || '100%');
-                self.injected.refresh();
+                self.input.setSize(null, (!self.fullScreen && self.height) || '100%');
+                self.input.refresh();
 
                 return self;
             },
@@ -222,7 +222,7 @@ This element is used to display a material code editor.
              */
             _commitFrom: function () {
                 var self = this;
-                self.value = self.injected.getValue();
+                self.value = self.input.getValue();
                 return self;
             },
 
@@ -235,7 +235,7 @@ This element is used to display a material code editor.
              */
             _commitTo: function () {
                 var self = this;
-                if (self.value !== self.injected.getValue()) { self.injected.setValue(self.value || ''); }
+                if (self.value !== self.input.getValue()) { self.input.setValue(self.value || ''); }
                 return self;
             },
 
@@ -256,12 +256,12 @@ This element is used to display a material code editor.
                 Polymer.dom.flush();
 
                 // Injecting
-                self._setInjected(CodeMirror.fromTextArea(input, XP.assign({autofocus: self.autoFocus, tabindex: self.tabIndex}, self.options)));
+                self._setInput(CodeMirror.fromTextArea(input, XP.assign({autofocus: self.autoFocus, tabindex: self.tabIndex}, self.options)));
 
                 // Listening
-                self.injected.on('blur', self._blurHandler.bind(self));
-                self.injected.on('change', self._changeHandler.bind(self));
-                self.injected.on('focus', self._focusHandler.bind(self));
+                self.input.on('blur', self._blurHandler.bind(self));
+                self.input.on('change', self._changeHandler.bind(self));
+                self.input.on('focus', self._focusHandler.bind(self));
 
                 return self;
             },
@@ -277,14 +277,14 @@ This element is used to display a material code editor.
 
                 // Vars
                 var self  = this,
-                    input = self.injected.getTextArea();
+                    input = self.input.getTextArea();
 
                 // Updating (editor)
-                self.injected.setOption('indentUnit', self.indent);
-                self.injected.setOption('lineNumbers', self.lineNumbers);
-                self.injected.setOption('mode', self.mode);
-                self.injected.setOption('readOnly', self.readonly);
-                self.injected.setOption('tabSize', self.indent);
+                self.input.setOption('indentUnit', self.indent);
+                self.input.setOption('lineNumbers', self.lineNumbers);
+                self.input.setOption('mode', self.mode);
+                self.input.setOption('readOnly', self.readonly);
+                self.input.setOption('tabSize', self.indent);
 
                 // Updating (input)
                 XP.setAttribute(input, 'name', self.name);
@@ -405,8 +405,8 @@ This element is used to display a material code editor.
                 showCursorWhenSelecting: true,
                 theme: 'ambiance',
                 extraKeys: {
-                    Tab: function(injected) {
-                        injected.replaceSelection(XP.repeat(' ', injected.getOption("indentUnit")));
+                    Tab: function(input) {
+                        input.replaceSelection(XP.repeat(' ', input.getOption("indentUnit")));
                     }
                 }
             },
