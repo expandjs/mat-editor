@@ -5,18 +5,22 @@
 
     <template>
 
-        <mat-demo label="Default" padding-disabled>
-            <script type="text/html">
-                <mat-editor height="300" model="{{codeHTML}}" line-numbers></mat-editor>
-            </script>
-            <mat-editor height="300" model="{{codeHTML}}" line-numbers></mat-editor>
-        </mat-demo>
+        <mat-demo name="mat-editor" type="element" url="http://expandjs.com/elements/mat-editor">
 
-        <mat-demo label="Javascript" padding-disabled>
-            <script type="text/html">
+            <mat-demo-panel label="Default" padding-disabled>
+                <script type="text/html">
+                    <mat-editor height="300" model="{{codeHTML}}" line-numbers></mat-editor>
+                </script>
+                <mat-editor height="300" model="{{codeHTML}}" line-numbers></mat-editor>
+            </mat-demo-panel>
+
+            <mat-demo-panel label="Javascript" padding-disabled>
+                <script type="text/html">
+                    <mat-editor mode="javascript" height="300" model="{{codeJS}}" line-numbers></mat-editor>
+                </script>
                 <mat-editor mode="javascript" height="300" model="{{codeJS}}" line-numbers></mat-editor>
-            </script>
-            <mat-editor mode="javascript" height="300" model="{{codeJS}}" line-numbers></mat-editor>
+            </mat-demo-panel>
+
         </mat-demo>
 
     </template>
