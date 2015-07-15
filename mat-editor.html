@@ -55,6 +55,7 @@ This element is used to display a material code editor.
             height: 100%;
             overflow: visible;
             text-align: left;
+            z-index: 0;
         }
 
         :host([full-screen]) {
@@ -62,7 +63,7 @@ This element is used to display a material code editor.
             height: auto !important;
             margin: 0 !important;
             width: auto !important;
-            z-index: 6;
+            z-index: 1;
         }
 
         :host ::content textarea {
