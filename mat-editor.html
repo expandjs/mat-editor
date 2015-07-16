@@ -55,7 +55,6 @@ This element is used to display a material code editor.
             height: 100%;
             overflow: visible;
             text-align: left;
-            z-index: 0;
         }
 
         :host([full-screen]) {
@@ -70,24 +69,15 @@ This element is used to display a material code editor.
             display: none !important;
         }
 
-        :host #matEditorLabel {
-            left: 0;
-            padding-bottom: 8px;
-            position: absolute;
-            right: 0;
-            top: -32px;
-        }
-
-        :host([empty-label]) #matEditorLabel,
-        :host([full-screen]) #matEditorLabel {
-            display: none !important;
-        }
-
         :host #matEditorWrapper,
         :host #matEditorContainer {
             height: 100%;
             position: relative;
             transition: none;
+        }
+
+        :host #matEditorWrapper {
+            z-index: 0;
         }
 
         :host(:not([empty-label])) #matEditorWrapper {
@@ -99,6 +89,19 @@ This element is used to display a material code editor.
         :host([full-screen]) #matEditorContainer {
             height: 100% !important;
             margin: 0 !important;
+        }
+
+        :host #matEditorLabel {
+            left: 0;
+            padding-bottom: 8px;
+            position: absolute;
+            right: 0;
+            top: -32px;
+        }
+
+        :host([empty-label]) #matEditorLabel,
+        :host([full-screen]) #matEditorLabel {
+            display: none !important;
         }
 
         :host #matEditorContainer ::content .CodeMirror {
