@@ -176,7 +176,7 @@ This element is used to display a material code editor.
              */
             blur: function () {
                 var self = this;
-                self.input.focus();
+                self.adaptee.focus();
                 return self;
             },
 
@@ -188,7 +188,7 @@ This element is used to display a material code editor.
              */
             focus: function () {
                 var self = this;
-                self.input.focus();
+                self.adaptee.focus();
                 return self;
             },
 
@@ -204,14 +204,14 @@ This element is used to display a material code editor.
                 var self = this;
 
                 // Checking
-                if (!self.input) { return self; }
+                if (!self.adaptee) { return self; }
 
                 // Styling
                 XP.setStyle(self.$.matEditorContainer, 'height', self.height ? self.height + 'px' : null);
 
                 // Resizing
-                self.input.setSize(null, (!self.fullScreen && self.height) || '100%');
-                self.input.refresh();
+                self.adaptee.setSize(null, (!self.fullScreen && self.height) || '100%');
+                self.adaptee.refresh();
 
                 return self;
             },
@@ -219,7 +219,34 @@ This element is used to display a material code editor.
             /*********************************************************************/
 
             /**
-             * Commits from input's value.
+             * Set the adaptee.
+             *
+             * @method _adapt
+             * @returns {Element}
+             * @private
+             */
+            _adapt: function () {
+
+                // Vars
+                var self    = this,
+                    adaptee = XP.appendChild(Polymer.dom(self), XP.createElement('textarea', {attributes: {value: self.value}}));
+
+                // Flushing
+                Polymer.dom.flush();
+
+                // Injecting
+                self._setAdaptee(CodeMirror.fromTextArea(adaptee, XP.assign({autofocus: self.autoFocus, tabindex: self.tabIndex}, self.options)));
+
+                // Listening
+                self.adaptee.on('blur', self._blurHandler.bind(self));
+                self.adaptee.on('change', self._changeHandler.bind(self));
+                self.adaptee.on('focus', self._focusHandler.bind(self));
+
+                return self;
+            },
+
+            /**
+             * Reflects adapted input's `value` onto the element.
              *
              * @method _commitFrom
              * @returns {Element}
@@ -227,12 +254,12 @@ This element is used to display a material code editor.
              */
             _commitFrom: function () {
                 var self = this;
-                self.value = self.input.getValue();
+                self.value = self.adaptee.getValue();
                 return self;
             },
 
             /**
-             * Commits to input's value.
+             * Reflects element's `value` onto the adapted input.
              *
              * @method _commitTo
              * @returns {Element}
@@ -240,39 +267,12 @@ This element is used to display a material code editor.
              */
             _commitTo: function () {
                 var self = this;
-                if (self.value !== self.input.getValue()) { self.input.setValue(self.value || ''); }
+                if (self.value !== self.adaptee.getValue()) { self.adaptee.setValue(self.value || ''); }
                 return self;
             },
 
             /**
-             * Injects the input element.
-             *
-             * @method _inject
-             * @returns {Element}
-             * @private
-             */
-            _inject: function () {
-
-                // Vars
-                var self  = this,
-                    input = XP.appendChild(Polymer.dom(self), XP.createElement('textarea', {attributes: {value: self.value}}));
-
-                // Flushing
-                Polymer.dom.flush();
-
-                // Injecting
-                self._setInput(CodeMirror.fromTextArea(input, XP.assign({autofocus: self.autoFocus, tabindex: self.tabIndex}, self.options)));
-
-                // Listening
-                self.input.on('blur', self._blurHandler.bind(self));
-                self.input.on('change', self._changeHandler.bind(self));
-                self.input.on('focus', self._focusHandler.bind(self));
-
-                return self;
-            },
-
-            /**
-             * Updates the input.
+             * Updates adapted input's attributes.
              *
              * @method _update
              * @returns {Element}
@@ -281,18 +281,18 @@ This element is used to display a material code editor.
             _update: function () {
 
                 // Vars
-                var self  = this,
-                    input = self.input.getTextArea();
+                var self     = this,
+                    textarea = self.adaptee.getTextArea();
 
                 // Updating (editor)
-                self.input.setOption('indentUnit', self.indent);
-                self.input.setOption('lineNumbers', self.lineNumbers);
-                self.input.setOption('mode', self.mode);
-                self.input.setOption('readOnly', self.readonly);
-                self.input.setOption('tabSize', self.indent);
+                self.adaptee.setOption('indentUnit', self.indent);
+                self.adaptee.setOption('lineNumbers', self.lineNumbers);
+                self.adaptee.setOption('mode', self.mode);
+                self.adaptee.setOption('readOnly', self.readonly);
+                self.adaptee.setOption('tabSize', self.indent);
 
-                // Updating (input)
-                XP.setAttribute(input, 'name', self.name);
+                // Updating (textarea)
+                XP.setAttribute(textarea, 'name', self.name);
 
                 return self;
             },
@@ -301,7 +301,7 @@ This element is used to display a material code editor.
 
             // OBSERVERS
             observers: [
-                '_refresh(indent, lineNumbers, mode)',
+                '_refresh(indent, lineNumbers, mode, readonly)',
                 'resize(fullScreen, height)'
             ],
 
@@ -410,8 +410,8 @@ This element is used to display a material code editor.
                 showCursorWhenSelecting: true,
                 theme: 'ambiance',
                 extraKeys: {
-                    Tab: function(input) {
-                        input.replaceSelection(XP.repeat(' ', input.getOption("indentUnit")));
+                    Tab: function(editor) {
+                        editor.replaceSelection(XP.repeat(' ', editor.getOption("indentUnit")));
                     }
                 }
             },
