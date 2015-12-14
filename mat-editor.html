@@ -7,7 +7,7 @@ The complete set of contributors may be found at https://expandjs.github.io/CONT
 -->
 
 <!--
-An element used to display a Material Design code editor.
+A custom element used to display a Material Design code editor.
 
 ```html
 <mat-editor label="My editor"></mat-editor>
@@ -43,8 +43,9 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
 
 @element mat-editor
 @description A custom element used to display a Material Design code editor
-@keywords material design, material editor, material text editor, web app, html5, expandjs, web-components
+@keywords material design, expandjs, web app, custom elements, web-components
 @group inputs
+
 @homepage http://expandjs.com/elements/mat-editor
 @repository https://github.com/ExpandJS/mat-editor
 @demo http://expandjs.com/demo/mat-editor
@@ -52,29 +53,28 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
 @behavior xp-input-behavior /bower_components/xp-input-behavior/xp-input-behavior.html
 
 @dependency codemirror Codemirror/codemirror#^5.0.0
-@dependency polymer Polymer/polymer#^1.1.0
-@dependency expandjs ExpandJS/expandjs#0.9.11
+@dependency polymer Polymer/polymer#^1.2.0
+@dependency expandjs ExpandJS/expandjs#0.10.0
 @dependency iron-flex-layout PolymerElements/iron-flex-layout#^1.0.0
-@dependency mat-icon-button ExpandJS/mat-icon-button#0.9.11
-@dependency mat-icons ExpandJS/mat-icons#0.9.11
-@dependency mat-label ExpandJS/mat-label#0.9.11
-@dependency mat-paper ExpandJS/mat-paper#0.9.11
-@dependency xp-input-behavior ExpandJS/xp-input-behavior#0.9.11
+@dependency mat-icon-button ExpandJS/mat-icon-button#0.10.0
+@dependency mat-icons ExpandJS/mat-icons#0.10.0
+@dependency mat-input-behavior ExpandJS/mat-input-behavior#0.10.0
+@dependency mat-label ExpandJS/mat-label#0.10.0
+@dependency mat-typography ExpandJS/mat-typography#0.10.0
 
-@devDependency mat-demo ExpandJS/mat-demo#0.9.11
+@devDependency mat-demo ExpandJS/mat-demo#0.10.0
 -->
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../expandjs/expandjs.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../mat-icon-button/mat-icon-button.html">
-<link rel="import" href="../mat-icons/navigation-icons.html">
+<link rel="import" href="../mat-icons/mat-icons.html">
+<link rel="import" href="../mat-input-behavior/mat-input-behavior.html">
+<link rel="import" href="../mat-input-behavior/mat-input-styles.html">
 <link rel="import" href="../mat-label/mat-label.html">
-<link rel="import" href="../mat-paper/mat-paper.html">
-<link rel="import" href="../xp-input-behavior/xp-input-behavior.html">
-
-<link rel="stylesheet" href="../codemirror/lib/codemirror.css">
-<link rel="stylesheet" href="../codemirror/theme/ambiance.css">
+<link rel="import" href="../mat-typography/mat-typography.html">
+<link rel="import" href="mat-editor-styles.html">
 
 <script src="../codemirror/lib/codemirror.js"></script>
 <script src="../codemirror/mode/css/css.js"></script>
@@ -84,13 +84,15 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
 
 <dom-module id="mat-editor">
 
-    <template>
+    <template strip-whitespace>
+
+        <style include="mat-input-styles"></style>
+        <style include="mat-editor-styles"></style>
 
         <style>
             :host {
                 display: block;
                 height: 100%;
-                overflow: visible;
                 text-align: left;
             }
 
@@ -102,67 +104,34 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
                 z-index: 1;
             }
 
-            :host #matEditorWrapper,
-            :host #matEditorContainer {
-                height: 100%;
-                position: relative;
-                transition: none;
-            }
-
-            :host #matEditorWrapper {
-                z-index: 0;
-            }
-
-            :host(:not([empty-label])) #matEditorWrapper {
-                margin-top: 32px;
-                height: calc(100% - 32px);
-            }
-
-            :host([full-screen]) #matEditorWrapper,
-            :host([full-screen]) #matEditorContainer {
-                height: 100% !important;
-                margin: 0 !important;
-            }
-
-            :host #matEditorLabel {
-                left: 0;
+            :host .label {
+                margin: 0;
                 padding-bottom: 8px;
-                position: absolute;
-                right: 0;
-                top: -32px;
             }
 
-            :host([empty-label]) #matEditorLabel,
-            :host([full-screen]) #matEditorLabel {
+            :host([full-screen]) .label,
+            :host([label=""]) .label,
+            :host(:not([label])) .label {
                 display: none !important;
             }
 
-            :host #matEditorContainer ::content .CodeMirror {
+            :host .wrapper {
+                height: 100%;
+                padding: 0;
+                position: relative;
+                z-index: 0;
+            }
+
+            :host([label]:not([label=""]):not([full-screen])) .wrapper {
+                height: calc(100% - 40px);
+            }
+
+            :host .editor {
                 @apply(--mat-font-body);
+                height: 100%;
             }
 
-            :host #matEditorContainer ::content .CodeMirror,
-            :host #matEditorContainer ::content .CodeMirror-scrollbar-filler {
-                background: transparent !important;
-                cursor: text !important;
-            }
-
-            :host #matEditorContainer ::content .CodeMirror-gutters {
-                background: hsla(0, 0%, 26%, 1) !important;
-                border: none !important;
-            }
-
-            :host #matEditorContainer ::content .CodeMirror-gutters,
-            :host #matEditorContainer ::content .CodeMirror-hscrollbar,
-            :host #matEditorContainer ::content .CodeMirror-vscrollbar {
-                cursor: default !important;
-            }
-
-            :host #matEditorContainer ::content .CodeMirror-linenumber {
-                color: inherit;
-            }
-
-            :host #matEditorToggle {
+            :host .button {
                 opacity: 0.10;
                 position: absolute;
                 right: 4px;
@@ -170,19 +139,20 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
                 z-index: 2;
             }
 
-            :host #matEditorToggle:hover {
+            :host .button:hover {
                 opacity: 0.30;
             }
 
-            :host(:not([expandable])) #matEditorToggle {
+            :host(:not([expandable])) .button {
                 display: none !important;
             }
         </style>
 
-        <div id="matEditorWrapper">
-            <mat-label id="matEditorLabel" focused="[[focused]]">{{label}}</mat-label>
-            <mat-paper id="matEditorContainer" background="grey-900"><content id="content"></content></mat-paper>
-            <mat-icon-button id="matEditorToggle" active="{{fullScreen}}" active-icon="navigation:fullscreen-exit" color="white" icon="navigation:fullscreen" toggleable></mat-icon-button>
+        <label is="mat-label" disabled="[[disabled]]" focused="[[focused]]">[[label]]</label>
+
+        <div class="wrapper">
+            <div class="editor"><content></content></div>
+            <mat-icon-button class="button" active="{{fullScreen}}" active-icon="mat:fullscreen-exit" color="white" icon="mat:fullscreen" toggleable></mat-icon-button>
         </div>
 
     </template>
@@ -195,37 +165,13 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
 
             // BEHAVIORS
             behaviors: [
-                Polymer.XPInputBehavior
+                Polymer.MatInputBehavior
             ],
 
             /*********************************************************************/
 
             /**
-             * Blurs the input.
-             *
-             * @method blur
-             * @returns {Element}
-             */
-            blur: function () {
-                var self = this;
-                self.adaptee.focus();
-                return self;
-            },
-
-            /**
-             * Focuses the input
-             *
-             * @method focus
-             * @returns {Element}
-             */
-            focus: function () {
-                var self = this;
-                self.adaptee.focus();
-                return self;
-            },
-
-            /**
-             * Resizes the input
+             * Resizes the editor.
              *
              * @method resize
              * @returns {Element}
@@ -236,14 +182,14 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
                 var self = this;
 
                 // Checking
-                if (!self.adaptee) { return self; }
+                if (!self.input) { return self; }
 
                 // Styling
-                XP.setStyle(self.$.matEditorContainer, 'height', self.height ? self.height + 'px' : null);
+                self.editor.style.height = (self.height && self.height + 'px') || '';
 
                 // Resizing
-                self.adaptee.setSize(null, (!self.fullScreen && self.height) || '100%');
-                self.adaptee.refresh();
+                self.input.setSize(null, (!self.fullScreen && self.height) || '100%');
+                self.input.refresh();
 
                 return self;
             },
@@ -251,34 +197,7 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
             /*********************************************************************/
 
             /**
-             * Set the adaptee.
-             *
-             * @method _adapt
-             * @returns {Element}
-             * @private
-             */
-            _adapt: function () {
-
-                // Vars
-                var self    = this,
-                    adaptee = XP.appendChild(Polymer.dom(self), XP.createElement('textarea', {attributes: {value: self.value}}));
-
-                // Flushing
-                Polymer.dom.flush();
-
-                // Injecting
-                self._setAdaptee(CodeMirror.fromTextArea(adaptee, XP.assign({autofocus: self.autoFocus, tabindex: self.tabIndex}, self.options)));
-
-                // Listening
-                self.adaptee.on('blur', self._blurHandler.bind(self));
-                self.adaptee.on('change', self._changeHandler.bind(self));
-                self.adaptee.on('focus', self._focusHandler.bind(self));
-
-                return self;
-            },
-
-            /**
-             * Reflects adapted input's `value` onto the element.
+             * Reflects the native input's `value` onto the element.
              *
              * @method _commitFrom
              * @returns {Element}
@@ -286,12 +205,12 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
              */
             _commitFrom: function () {
                 var self = this;
-                self.value = self.adaptee.getValue();
+                self.value = self.input.getValue();
                 return self;
             },
 
             /**
-             * Reflects element's `value` onto the adapted input.
+             * Reflects the element's `value` onto the native input.
              *
              * @method _commitTo
              * @returns {Element}
@@ -299,12 +218,43 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
              */
             _commitTo: function () {
                 var self = this;
-                if (self.value !== self.adaptee.getValue()) { self.adaptee.setValue(self.value || ''); }
+                if (self.value !== self.input.getValue()) { self.input.setValue(self.value || ''); }
                 return self;
             },
 
             /**
-             * Updates adapted input's attributes.
+             * Injects the native input.
+             *
+             * @method _inject
+             * @returns {Element}
+             * @private
+             */
+            _inject: function () {
+
+                // Vars
+                var self    = this,
+                    input   = XP.assign(document.createElement('textarea'), {textContent: self.value}),
+                    options = XP.assign({}, self.options, {autofocus: self.autoFocus, tabindex: self.tabIndex});
+
+                // Appending
+                Polymer.dom(self).appendChild(input);
+
+                // Flushing
+                Polymer.dom.flush();
+
+                // Setting
+                self._setInput(CodeMirror.fromTextArea(input, options));
+
+                // Listening
+                self.input.on('blur', self._blurHandler.bind(self));
+                self.input.on('change', self._changeHandler.bind(self));
+                self.input.on('focus', self._focusHandler.bind(self));
+
+                return self;
+            },
+
+            /**
+             * Updates the native input's attributes.
              *
              * @method _update
              * @returns {Element}
@@ -313,27 +263,23 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
             _update: function () {
 
                 // Vars
-                var self     = this,
-                    textarea = self.adaptee.getTextArea();
+                var self = this;
 
-                // Updating (editor)
-                self.adaptee.setOption('indentUnit', self.indent);
-                self.adaptee.setOption('lineNumbers', self.lineNumbers);
-                self.adaptee.setOption('mode', self.mode);
-                self.adaptee.setOption('readOnly', self.readonly);
-                self.adaptee.setOption('tabSize', self.indent);
+                // Setting (editor)
+                self.input.setOption('mode', self.mode);
+                self.input.setOption('readOnly', self.readonly);
 
-                // Updating (textarea)
-                XP.setAttribute(textarea, 'name', self.name);
+                // Setting (textarea)
+                XP.setAttribute(self.input.getTextArea(), 'name', self.name);
 
                 return self;
             },
 
             /**
-             * Updates element's validation state.
+             * Validates the native input's `value`.
              *
              * @method _validate
-             * @param {boolean | string} [invalidMessage = ""]
+             * @param {boolean | string} [invalidMessage]
              * @returns {Element}
              * @private
              */
@@ -346,7 +292,7 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
                 var self = this;
 
                 // Setting
-                self._setInvalidMessage(invalidMessage !== undefined ? invalidMessage || null : self.invalidMessage);
+                self._setInvalidMessage(XP.isDefined(invalidMessage) ? invalidMessage || null : self.invalidMessage);
                 self._setInvalid(!!self.invalidMessage);
 
                 return self;
@@ -356,12 +302,35 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
 
             // OBSERVERS
             observers: [
-                '_refresh(indent, lineNumbers, mode, readonly)',
-                'resize(fullScreen, height)'
+                'resize(fullScreen, height)',
+                'update(mode, readonly)'
             ],
+
+            // OPTIONS
+            options: {
+                indentUnit: 4,
+                lineNumbers: true,
+                showCursorWhenSelecting: true,
+                tabSize: 4,
+                theme: 'material',
+                extraKeys: {Tab: function(editor) { editor.replaceSelection(XP.repeat(' ', 4)); }}
+            },
 
             // PROPERTIES
             properties: {
+
+                /**
+                 * The editor's wrapper.
+                 *
+                 * @attribute editor
+                 * @type Element
+                 * @notifies
+                 * @readonly
+                 */
+                editor: {
+                    notify: true,
+                    readOnly: true
+                },
 
                 /**
                  * If set to true, the input's full screen toggle is visible.
@@ -397,45 +366,17 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
                  */
                 height: {
                     reflectToAttribute: true,
-                    type: Number,
-                    value: null
+                    type: Number
                 },
 
                 /**
-                 * How many spaces to be used for the indentation.
-                 *
-                 * @attribute indent
-                 * @type number
-                 * @default 4
-                 */
-                indent: {
-                    reflectToAttribute: true,
-                    type: Number,
-                    value: 4
-                },
-
-                /**
-                 * If set to true, line numbers are visible.
-                 *
-                 * @attribute line-numbers
-                 * @type boolean
-                 * @default false
-                 */
-                lineNumbers: {
-                    reflectToAttribute: true,
-                    type: Boolean,
-                    value: false
-                },
-
-                /**
-                 * The mode to be used for the editor.
+                 * The [editing mode](https://codemirror.net/doc/manual.html#overview).
                  *
                  * @attribute mode
                  * @type string
                  * @default "htmlmixed"
                  */
                 mode: {
-                    reflectToAttribute: true,
                     type: String,
                     value: 'htmlmixed'
                 },
@@ -454,28 +395,20 @@ Generally, we recommend to use the `model` for data binding and `value` to set t
                 }
             },
 
-            /**
-             * The default options.
-             *
-             * @property options
-             * @type Object
-             * @readonly
-             */
-            options: {
-                showCursorWhenSelecting: true,
-                theme: 'ambiance',
-                extraKeys: {
-                    Tab: function(editor) {
-                        editor.replaceSelection(XP.repeat(' ', editor.getOption("indentUnit")));
-                    }
-                }
-            },
-
             /*********************************************************************/
 
             // LISTENER
             attached: function () {
-                XP.delay(this.resize.bind(this));
+
+                // Frame 1
+                requestAnimationFrame(this.resize.bind(this));
+            },
+
+            // LISTENER
+            ready: function () {
+
+                // Setting
+                this._setEditor(Polymer.dom(this.root).querySelector('.editor'));
             }
         });
     </script>
